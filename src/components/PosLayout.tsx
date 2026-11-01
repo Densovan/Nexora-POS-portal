@@ -8,6 +8,7 @@ import {
   ReceiptText,
   RefreshCw,
   ShoppingCart,
+  UserRound,
   Wallet,
 } from 'lucide-react';
 import { posApi, queryKeys } from '@nexora/api-client';
@@ -16,6 +17,7 @@ import { usePermissions } from '@nexora/permissions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { mediaUrl } from '@/lib/media';
 import { StatusBadge } from '@/components/status-badge';
 import { useToast } from '@/components/toast';
 import { usePosRegister } from '../registers/RegisterProvider';
@@ -143,9 +145,17 @@ export function PosLayout() {
                 onClick={() => setMenuOpen((open) => !open)}
                 className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1 pl-1 pr-3 transition hover:bg-white/10"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-[11px] font-semibold text-emerald-200">
-                  {(auth.user?.fullName ?? auth.user?.email ?? '?').slice(0, 2).toUpperCase()}
-                </span>
+                {mediaUrl(auth.user?.avatarUrl) ? (
+                  <img
+                    src={mediaUrl(auth.user?.avatarUrl) ?? undefined}
+                    alt=""
+                    className="h-7 w-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-[11px] font-semibold text-emerald-200">
+                    {(auth.user?.fullName ?? auth.user?.email ?? '?').slice(0, 2).toUpperCase()}
+                  </span>
+                )}
                 <span className="hidden text-xs font-medium sm:block">
                   {auth.user?.fullName ?? auth.user?.email}
                 </span>
@@ -171,6 +181,13 @@ export function PosLayout() {
                     >
                       <MonitorSmartphone className="h-4 w-4" /> Change register
                     </button>
+                    <Link
+                      to="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm hover:bg-slate-50"
+                    >
+                      <UserRound className="h-4 w-4" /> Profile
+                    </Link>
                     <button
                       onClick={() => void signOut()}
                       className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-rose-600 hover:bg-rose-50"

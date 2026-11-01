@@ -29,6 +29,7 @@ export interface UserView {
   id: UUID;
   email: string;
   fullName: string;
+  avatarUrl: string | null;
   status: UserStatus;
 }
 
@@ -37,12 +38,13 @@ export interface Organization {
   name: string;
   slug: string;
   status: 'PENDING' | 'ACTIVE' | 'SUSPENDED' | 'CLOSED' | string;
-  businessMode: 'RETAIL' | 'WHOLESALE' | 'HYBRID' | string;
+  businessMode: 'RETAIL' | 'WHOLESALE' | 'HYBRID' | 'FOOD_SERVICE' | string;
   defaultCurrency: string;
   defaultLocale: string;
   timezone: string;
   phone: string | null;
   address: string | null;
+  logoUrl: string | null;
 }
 
 export interface Membership {
@@ -69,6 +71,8 @@ export interface MeResponse {
   user: UserView;
   organization: Organization | null;
   memberships: Membership[];
+  organizationOwner?: boolean;
+  features?: string[];
 }
 
 export interface LoginRequest {
@@ -81,7 +85,7 @@ export interface RegisterRequest {
   password: string;
   fullName: string;
   organizationName: string;
-  businessMode?: 'RETAIL' | 'WHOLESALE' | 'HYBRID';
+  businessMode?: 'RETAIL' | 'WHOLESALE' | 'HYBRID' | 'FOOD_SERVICE';
   currency?: string;
   timezone?: string;
 }
@@ -95,6 +99,18 @@ export interface AcceptInvitationRequest {
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+export interface UpdateProfileRequest {
+  fullName?: string;
+  avatarUrl?: string;
+}
+
+export interface ImageUploadResponse {
+  filename: string;
+  url: string;
+  contentType: string;
+  size: number;
 }
 
 /* -------------------------------------------------------------- tenancy */
@@ -142,6 +158,7 @@ export interface UpdateOrganizationRequest {
   defaultLocale?: string;
   timezone?: string;
   businessMode?: string;
+  logoUrl?: string;
 }
 
 /* ---------------------------------------------------------- authorization */
@@ -215,6 +232,8 @@ export interface Product {
   sku: string;
   name: string;
   description: string | null;
+  imageUrl: string | null;
+  displayOrder: number;
   categoryId: UUID | null;
   unit: string | null;
   costPrice: string | null;
@@ -222,13 +241,22 @@ export interface Product {
   currency: string;
   trackInventory: boolean;
   allowFractionalQuantity: boolean;
+  showOnMenu: boolean;
   active: boolean;
+}
+
+export interface OpeningStock {
+  stockLocationId: UUID;
+  quantity: number;
+  notes?: string;
 }
 
 export interface CreateProductRequest {
   sku: string;
   name: string;
   description?: string;
+  imageUrl?: string;
+  displayOrder?: number;
   categoryId?: UUID | null;
   unit?: string;
   costPrice?: number | null;
@@ -236,10 +264,23 @@ export interface CreateProductRequest {
   currency: string;
   trackInventory?: boolean;
   allowFractionalQuantity?: boolean;
+  showOnMenu?: boolean;
+  openingStock?: OpeningStock;
 }
 
-export interface UpdateProductRequest extends Partial<Omit<CreateProductRequest, 'currency'>> {
+export interface UpdateProductRequest
+  extends Partial<Omit<CreateProductRequest, 'currency' | 'openingStock'>> {
   active?: boolean;
+}
+
+export interface ProductAvailabilityOverride {
+  productId: UUID;
+  available: boolean;
+}
+
+export interface BranchAvailability {
+  branchId: UUID;
+  overrides: ProductAvailabilityOverride[];
 }
 
 export interface Barcode {

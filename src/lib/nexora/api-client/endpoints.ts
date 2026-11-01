@@ -19,6 +19,7 @@ import type {
   CustomerBalance,
   CustomerReceivable,
   InventoryMovement,
+  ImageUploadResponse,
   LoginRequest,
   MeResponse,
   Member,
@@ -39,6 +40,8 @@ import type {
   PriceList,
   Product,
   ProductPrice,
+  ProductAvailabilityOverride,
+  BranchAvailability,
   Purchase,
   RecordPaymentRequest,
   RecordSubscriptionPaymentRequest,
@@ -61,6 +64,7 @@ import type {
   UpdateCustomerRequest,
   UpdateOrganizationRequest,
   UpdateProductRequest,
+  UpdateProfileRequest,
   UpdateRoleRequest,
   UUID,
 } from '@nexora/api-types';
@@ -75,10 +79,20 @@ export const authApi = {
   acceptInvitation: (body: AcceptInvitationRequest) =>
     api.post<AuthResponse>('/auth/invitations/accept', body).then((r) => r.data),
   me: () => api.get<MeResponse>('/auth/me').then((r) => r.data),
+  updateProfile: (body: UpdateProfileRequest) =>
+    api.patch<MeResponse>('/auth/me', body).then((r) => r.data),
   permissions: () => api.get<string[]>('/auth/me/permissions').then((r) => r.data),
   logout: () => api.post<void>('/auth/logout').then((r) => r.data),
   changePassword: (body: ChangePasswordRequest) =>
     api.post<void>('/auth/password', body).then((r) => r.data),
+};
+
+export const uploadsApi = {
+  image: (file: File) => {
+    const body = new FormData();
+    body.append('file', file);
+    return api.post<ImageUploadResponse>('/uploads/images', body).then((r) => r.data);
+  },
 };
 
 export const organizationApi = {
@@ -141,6 +155,16 @@ export const catalogApi = {
     api.post<Product>('/products', body).then((r) => r.data),
   updateProduct: (id: UUID, body: UpdateProductRequest) =>
     api.patch<Product>(`/products/${id}`, body).then((r) => r.data),
+  availability: (branchId: UUID) =>
+    api
+      .get<BranchAvailability>('/products/availability', { params: { branchId } })
+      .then((r) => r.data),
+  setAvailability: (productId: UUID, branchId: UUID, available: boolean) =>
+    api
+      .put<ProductAvailabilityOverride>(`/products/${productId}/availability/${branchId}`, {
+        available,
+      })
+      .then((r) => r.data),
   barcodes: (productId: UUID, page = 0, size = 50) =>
     api
       .get<PageResponse<Barcode>>(`/products/${productId}/barcodes`, { params: { page, size } })

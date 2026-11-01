@@ -3,6 +3,7 @@ export { queryKeys } from './keys';
 export { session, SESSION_EXPIRED_EVENT, notifySessionExpired } from './session';
 export {
   authApi,
+  uploadsApi,
   organizationApi,
   branchApi,
   roleApi,

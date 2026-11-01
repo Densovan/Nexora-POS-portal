@@ -11,6 +11,7 @@ import { ShiftDetailPage } from './features/shift/ShiftDetailPage';
 import { TransactionsPage } from './features/transactions/TransactionsPage';
 import { ReceiptPage } from './features/transactions/ReceiptPage';
 import { DailyReportPage } from './features/reports/DailyReportPage';
+import { PosProfilePage } from './features/profile/PosProfilePage';
 import { NotFoundPage } from './features/NotFoundPage';
 
 export function App() {
@@ -34,6 +35,7 @@ export function App() {
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/transactions/:saleId" element={<ReceiptPage />} />
           <Route path="/reports" element={<DailyReportPage />} />
+          <Route path="/profile" element={<PosProfilePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

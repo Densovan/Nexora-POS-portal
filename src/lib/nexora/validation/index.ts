@@ -15,7 +15,7 @@ export const registerSchema = z.object({
   email: z.string().trim().email('Enter a valid email'),
   password: z.string().min(8, 'At least 8 characters').max(100),
   organizationName: z.string().trim().min(2, 'Enter a business name').max(200),
-  businessMode: z.enum(['RETAIL', 'WHOLESALE', 'HYBRID']),
+  businessMode: z.enum(['RETAIL', 'WHOLESALE', 'HYBRID', 'FOOD_SERVICE']),
   currency: currencySchema,
   timezone: z.string().max(50).optional(),
 });

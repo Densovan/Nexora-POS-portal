@@ -45,6 +45,19 @@ function toApiError(error: unknown): ApiError {
 
 type RetriableConfig = InternalAxiosRequestConfig & { _retried?: boolean };
 
+// Calls that create or renew a session must fail fast instead of triggering a refresh loop.
+const NO_REFRESH_PATHS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/invitations/accept',
+  '/auth/refresh',
+];
+
+export function canRefreshSession(url: string | undefined): boolean {
+  if (!url) return true;
+  return !NO_REFRESH_PATHS.some((path) => url.includes(path));
+}
+
 let refreshPromise: Promise<string> | null = null;
 
 async function refreshAccessToken(): Promise<string> {
@@ -87,8 +100,13 @@ export function createApiClient(): AxiosInstance {
     async (error: AxiosError) => {
       const config = error.config as RetriableConfig | undefined;
       const status = error.response?.status;
-      const isAuthCall = Boolean(config?.url?.includes('/auth/'));
-      if (status === 401 && config && !config._retried && !isAuthCall && session.refreshToken) {
+      if (
+        status === 401 &&
+        config &&
+        !config._retried &&
+        canRefreshSession(config.url) &&
+        session.refreshToken
+      ) {
         config._retried = true;
         const token = await refreshAccessToken();
         config.headers.set('Authorization', `Bearer ${token}`);
