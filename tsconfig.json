@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@nexora/api-types": ["src/lib/nexora/api-types/index.ts"],
+      "@nexora/api-client": ["src/lib/nexora/api-client/index.ts"],
+      "@nexora/auth": ["src/lib/nexora/auth/index.tsx"],
+      "@nexora/permissions": ["src/lib/nexora/permissions/index.tsx"],
+      "@nexora/validation": ["src/lib/nexora/validation/index.ts"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "tests", "e2e", "vite.config.ts", "vitest.config.ts", "playwright.config.ts"]
+}
