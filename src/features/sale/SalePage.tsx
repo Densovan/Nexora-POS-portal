@@ -6,6 +6,7 @@ import {
   Banknote,
   Barcode,
   Minus,
+  Package,
   Plus,
   ScanBarcode,
   Search,
@@ -30,6 +31,8 @@ import {
 } from '@/components/ui/select';
 import { StatusBadge } from '@/components/status-badge';
 import { formatMoney } from '@/lib/format';
+import { mediaUrl } from '@/lib/media';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/components/toast';
 import { usePosRegister } from '../../registers/RegisterProvider';
 import { RequireRegister } from '../../components/RequireRegister';
@@ -46,6 +49,7 @@ interface CartLine {
   quantity: number;
   discountAmount: number;
   onHand: number | null;
+  imageUrl: string | null;
 }
 
 interface TenderLine {
@@ -75,6 +79,43 @@ const newTender = (amount = ''): TenderLine => ({
   amount,
   reference: '',
 });
+
+function ProductThumb({
+  imageUrl,
+  alt,
+  className,
+}: {
+  imageUrl: string | null | undefined;
+  alt: string;
+  className?: string;
+}) {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const src = mediaUrl(imageUrl);
+
+  if (!src || failedSrc === src) {
+    return (
+      <span
+        aria-hidden="true"
+        className={cn(
+          'flex shrink-0 items-center justify-center bg-slate-100 text-slate-400',
+          className,
+        )}
+      >
+        <Package className="h-5 w-5" />
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      onError={() => setFailedSrc(src)}
+      className={cn('shrink-0 bg-slate-100 object-cover', className)}
+    />
+  );
+}
 
 export function SalePage() {
   return (
@@ -159,6 +200,7 @@ function SaleWorkspace() {
     trackInventory: boolean;
     allowFractional: boolean;
     onHand?: number | null;
+    imageUrl?: string | null;
   }) => {
     if (!Number.isFinite(product.unitPrice) || product.unitPrice <= 0) {
       toast({
@@ -199,6 +241,7 @@ function SaleWorkspace() {
           quantity: 1,
           discountAmount: 0,
           onHand: product.onHand ?? null,
+          imageUrl: product.imageUrl ?? null,
         },
       ];
     });
@@ -214,6 +257,7 @@ function SaleWorkspace() {
       currency: product.currency,
       trackInventory: product.trackInventory,
       allowFractional: product.allowFractionalQuantity,
+      imageUrl: product.imageUrl,
     });
   };
 
@@ -493,22 +537,29 @@ function SaleWorkspace() {
                     key={product.id}
                     type="button"
                     onClick={() => addCatalogProduct(product)}
-                    className="group flex flex-col rounded-xl border border-slate-200 bg-white p-3 text-left transition hover:border-emerald-300 hover:bg-emerald-50/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                    className="group flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 text-left transition hover:border-emerald-300 hover:bg-emerald-50/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
                   >
-                    <span className="flex items-start justify-between gap-2">
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-medium text-slate-900">
-                          {product.name}
+                    <ProductThumb
+                      imageUrl={product.imageUrl}
+                      alt={product.name}
+                      className="h-12 w-12 rounded-lg"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-start justify-between gap-2">
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium text-slate-900">
+                            {product.name}
+                          </span>
+                          <span className="block text-[11px] text-slate-500">{product.sku}</span>
                         </span>
-                        <span className="block text-[11px] text-slate-500">{product.sku}</span>
+                        <Plus className="h-4 w-4 shrink-0 text-slate-300 group-hover:text-emerald-600" />
                       </span>
-                      <Plus className="h-4 w-4 shrink-0 text-slate-300 group-hover:text-emerald-600" />
-                    </span>
-                    <span className="mt-auto flex items-baseline justify-between gap-2 pt-3">
-                      <span className="text-sm font-semibold text-slate-900">
-                        {formatMoney(product.sellingPrice, product.currency)}
+                      <span className="mt-2 flex items-baseline justify-between gap-2">
+                        <span className="text-sm font-semibold text-slate-900">
+                          {formatMoney(product.sellingPrice, product.currency)}
+                        </span>
+                        <span className="text-[11px] text-slate-400">{product.unit ?? 'each'}</span>
                       </span>
-                      <span className="text-[11px] text-slate-400">{product.unit ?? 'each'}</span>
                     </span>
                   </button>
                 ))}
@@ -554,8 +605,13 @@ function SaleWorkspace() {
                   line.trackInventory && line.onHand !== null && line.onHand < line.quantity;
                 return (
                   <li key={line.productId} className="px-5 py-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
+                    <div className="flex items-start gap-3">
+                      <ProductThumb
+                        imageUrl={line.imageUrl}
+                        alt={line.name}
+                        className="h-10 w-10 rounded-lg"
+                      />
+                      <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-slate-900">{line.name}</p>
                         <p className="text-[11px] text-slate-500">
                           {line.sku} · {formatMoney(line.unitPrice, line.currency)}
@@ -570,7 +626,7 @@ function SaleWorkspace() {
                       <button
                         type="button"
                         onClick={() => removeLine(line.productId)}
-                        className="rounded-lg p-1 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                        className="shrink-0 rounded-lg p-1 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
                         aria-label={`Remove ${line.name}`}
                       >
                         <Trash2 className="h-3.5 w-3.5" />

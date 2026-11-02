@@ -635,6 +635,7 @@ export interface PosProduct {
   sku: string;
   name: string;
   unit: string | null;
+  imageUrl: string | null;
   sellingPrice: string;
   currency: string;
   trackInventory: boolean;
