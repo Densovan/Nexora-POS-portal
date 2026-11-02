@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from '@nexora/auth';
 import { RegisterProvider } from './registers/RegisterProvider';
 import { PosLayout } from './components/PosLayout';
+import { RequireFeature } from './components/RequireFeature';
 import { PosLoginPage } from './features/auth/PosLoginPage';
 import { RegisterSelectionPage } from './features/register/RegisterSelectionPage';
 import { SalePage } from './features/sale/SalePage';
@@ -22,7 +23,9 @@ export function App() {
         <Route
           element={
             <ProtectedRoute>
-              <PosLayout />
+              <RequireFeature feature="POS">
+                <PosLayout />
+              </RequireFeature>
             </ProtectedRoute>
           }
         >

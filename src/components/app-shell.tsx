@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -201,22 +202,24 @@ export function AppShell({
                     <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel className="font-normal">
-                      <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                      <p className="truncate text-xs text-slate-500">{user.email}</p>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      render={<Link to="/settings/profile" className="cursor-pointer" />}
-                    >
-                      <UserRound className="mr-2 h-4 w-4" /> Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={onLogout}
-                      className="cursor-pointer text-rose-600 focus:bg-rose-50 focus:text-rose-600"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" /> Sign out
-                    </DropdownMenuItem>
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel className="font-normal">
+                        <p className="text-sm font-medium text-slate-900">{user.name}</p>
+                        <p className="truncate text-xs text-slate-500">{user.email}</p>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        render={<Link to="/settings/profile" className="cursor-pointer" />}
+                      >
+                        <UserRound className="mr-2 h-4 w-4" /> Profile
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={onLogout}
+                        className="cursor-pointer text-rose-600 focus:bg-rose-50 focus:text-rose-600"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" /> Sign out
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

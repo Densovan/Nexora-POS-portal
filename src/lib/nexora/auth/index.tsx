@@ -35,6 +35,7 @@ interface AuthState {
   memberships: Membership[];
   membership: Membership | null;
   permissions: Set<string>;
+  features: Set<string>;
   isPlatformAdmin: boolean;
   message: string | null;
 }
@@ -52,6 +53,7 @@ interface AuthContextValue extends AuthState {
   switchOrganization: (organizationId: string) => Promise<void>;
   setActiveBranch: (branchId: string | null) => void;
   activeBranchId: string | null;
+  hasFeature: (code: string) => boolean;
 }
 
 const ANONYMOUS: AuthState = {
@@ -61,6 +63,7 @@ const ANONYMOUS: AuthState = {
   memberships: [],
   membership: null,
   permissions: new Set(),
+  features: new Set(),
   isPlatformAdmin: false,
   message: null,
 };
@@ -121,6 +124,7 @@ export function AuthProvider({ children, requirePlatformAdmin = false }: AuthPro
         memberships: me.memberships,
         membership: membershipFor(me),
         permissions,
+        features: new Set(me.features ?? []),
         isPlatformAdmin: options.platformVerified,
         message: null,
       };
@@ -341,6 +345,7 @@ export function AuthProvider({ children, requirePlatformAdmin = false }: AuthPro
       switchOrganization,
       setActiveBranch,
       activeBranchId,
+      hasFeature: (code: string) => state.features.has(code),
     }),
     [state, login, register, logout, refresh, switchOrganization, setActiveBranch, activeBranchId],
   );
